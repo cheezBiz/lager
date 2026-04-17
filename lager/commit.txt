@@ -1,0 +1,240 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.30;
+
+contract lager {
+
+//-----------------------------------//
+//----------STATE VARIABLES ---------//
+
+    //conversation index
+    mapping(uint => bool) public conversation;
+    
+    //participants of a conversation
+    mapping(uint => mapping(address => bool)) public users;
+
+    //fees
+    uint public fees;
+    
+    //owners
+    mapping(address => bool) owners;
+
+    //owners
+    address[3] public ownerAddresses;
+
+    //consensus
+    mapping(address => bool) consensus;
+
+    //consensus count
+    bool consensusResult;
+
+    //re-Entrancy Protection
+    bool noReEnter;
+
+    //pausing
+    bool pause;
+
+    //leaderShip removal
+    mapping(address => mapping(address => bool)) leaderShip_control;
+
+//----------STATE VARIABLES ---------//
+//-----------------------------------//
+
+
+
+//-----------------------------------//
+//------------- EVENTS --------------//
+
+    //conversation created
+    event conversationCreated(uint indexed conversationID);
+
+    //message event
+    event message(uint indexed conversationID, bytes message);    
+
+    //participant addition
+    event participantAdded(uint indexed conversationID, address participant);
+
+    //contract state
+    event contractIs(bool state);
+
+    //consensus state
+    event consensusState(bool state);
+
+    //consensus vote
+    event voted(address voter, bool vote);
+
+    //leader removal
+    event leaderRemoved(address removedLeader);
+
+    //leader added
+    event leaderAdded(address newLeader);
+
+//------------- EVENTS --------------//
+//-----------------------------------//
+
+//-----------------------------------//
+//------------ MODIFIERS ------------//
+
+    modifier paused {
+        require(!pause, "Contract is paused");
+        _;
+    }
+
+    modifier checkConsenus {
+        require(consensusResult == true, "No agreement");
+        _;
+        consensusResult = false;
+    }
+
+    modifier onlyOwner {
+        require(owners[msg.sender] == true, "not an owner");
+        _;
+    }
+
+    modifier reEntrancyProtection{
+        require(!noReEnter, "function already in use");
+        noReEnter = true;
+        _;
+        noReEnter = false;
+    }
+
+    constructor(uint fees_, address owner_1, address owner_2, address owner_3){
+        fees = fees_;
+        owners[owner_1] = true;
+        owners[owner_2] = true;
+        owners[owner_3] = true;
+
+        ownerAddresses[0] = owner_1;
+        ownerAddresses[1] = owner_2;
+        ownerAddresses[2] = owner_3;
+    }
+
+    function createConversation(uint identifier) external payable paused {
+
+        //check required fees
+        require(msg.value >= fees, "Not enough fees");
+
+        //this ensures conversation is not already in use
+        require(conversation[identifier]==false, "Conversation Identifier already in use, please use a different one");
+
+        //this creates a conversation
+        conversation[identifier] = true;
+
+        //this adds the creator as a participant
+        users[identifier][msg.sender] = true;
+
+        //emit event
+        emit conversationCreated(identifier);
+    }
+
+    function addParticipant(uint identifier, address participant) external paused {
+        //this ensures conversation is active
+        require(conversation[identifier] == true, "conversation not active");
+
+        //this ensures user (function caller) is a participant
+        require(users[identifier][msg.sender] == true);
+
+        //adds participant to the conversation
+        users[identifier][participant] = true;
+
+        //emit event
+        emit participantAdded(identifier, participant);
+    }
+
+    function deliverMessage(uint identifier, bytes memory message_) external paused {
+        //this ensures conversation is active
+        require(conversation[identifier] == true, "conversation not active");
+
+        //this ensures function caller is a participant
+        require(users[identifier][msg.sender] == true);
+
+        //this emits the message
+        emit message(identifier, message_);
+    }
+
+//===============================================================================//
+//======================== ACCESS CONTROL AND SECURITY ==========================//
+
+    function getConsensus() external {
+        uint8 consensusCount;
+        for(uint8 i=0; i<3; i++){
+            if(consensus[ownerAddresses[i]] == true){
+                consensusCount++;
+            }
+        }
+        if(consensusCount >=2){
+            consensusResult = true;
+        }
+
+        //emit event
+        emit consensusState(consensusResult);
+
+    }
+
+    function pauseContract (bool state) external onlyOwner checkConsenus {
+        
+        //set contract state
+        pause = state;
+
+        //emit event
+        emit contractIs(state);
+    }
+
+    function agree (bool state) external onlyOwner {
+        consensus[msg.sender] = state;
+
+        //emit event
+        emit voted(msg.sender, state);
+    }
+
+    function vote(address leader, bool state) external onlyOwner {
+        leaderShip_control[leader][msg.sender] = state; 
+    }
+
+    function removeLeader(address recipient, address otherLeader) external onlyOwner {
+        if(leaderShip_control[recipient][msg.sender] == true && leaderShip_control[recipient][otherLeader] == true){
+            owners[recipient] = false;
+        }
+        else{
+            revert("Not enough leaders agree");
+        }
+
+        for(uint8 i=0; i<3; i++){
+            if(ownerAddresses[i] == recipient){
+                ownerAddresses[i] = address(0);
+                consensus[recipient] = false;
+            }
+        }
+
+        //emit leaderRemoved
+        emit leaderRemoved(recipient);
+    }
+
+    function addLeader(address newLeader, address otherLeader) external onlyOwner {
+        if(leaderShip_control[newLeader][msg.sender] == true && leaderShip_control[newLeader][otherLeader] == true){
+            owners[newLeader] = true;
+        }
+        else{
+            revert("Not enough leaders agree");
+        }
+
+        for(uint i=0; i<3; i++){
+            if(ownerAddresses[i] == address(0)){
+                ownerAddresses[i]=newLeader;
+            }
+        }
+
+        //emit leaderAdded
+        emit leaderAdded(newLeader);
+    }
+
+    function extractFunds(address payable recipient, uint amount) external onlyOwner checkConsenus reEntrancyProtection paused {
+        (bool success, ) = recipient.call{gas: 2300, value: amount}("");
+        require(success, "failed transfer");
+    }
+
+    receive() external payable {}
+
+    fallback() external payable {}
+
+}

@@ -1,0 +1,32 @@
+==
+- Its intended to be deployed on EVM based chains.
+==
+
+==
+- The project aims to provide users to communicate anonymously based on events.
+==
+
+=============== 
+WEB3 jobs
+
+==
+A conversation gets started by a user paying a small fee once, the messages get hashed client side, and get sent to the the conversation, which then emits an event.
+==
+
+==
+The events get caught by our web-interface, depending on the conversation the user intends to read.
+==
+
+==
+Its the responsibility of the user to send the encryption key off chain to the intended recipient to able to decode the messages
+==
+
+===============
+WEB2 jobs
+
+==
+The interface may provide the option to store the encryption key in cookies, to prevent inputting it everytime, to decode a message
+
+WARNING!
+its not recommended to store encryption key, in your cookies, as it opens doors to XSS attacks from malicious extensions, and potential malwares.
+===============
