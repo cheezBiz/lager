@@ -3,532 +3,182 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Lager</title>
+      <!-- CSS file -->
+      <link rel="stylesheet" href="style.css">
    </head>
    <body>
-      <h1>welcome to lager!</h1>
-      <table>
-         <!-- state view functions -->
+      <h1>Welcome to Lager!</h1>
+      <table id="state_view_functions">
+         <!-- ===== State View Functions ===== -->
          <tr>
+            <!-- Check if conversation is created -->
             <td>
-               <button onclick="viewFees()">View Fees</button>
+               <label for="convoID">Check if conversation is created</label><br>
+               <input type="number" id="convoID"><br>
+               <button onclick="conversationCreated()">
+               Check if conversation is created
+               </button>
+            </td>
+            <!-- Check participants -->
+            <td>
+               <label for="participantID, participantAddress">
+               Check conversation Participants
+               </label><br>
+               <input type="number" id="participantID" placeholder="Participant ID"><br>
+               <input type="text" id="participantAddress" placeholder="Participant Address"><br>
+               <button onclick="conversationParticipants()">
+               Check Participants
+               </button>
+            </td>
+            <!-- View fees -->
+            <td>
+               <label for="viewFees">View Fees</label><br>
+               <button id="viewFees" onclick="viewFees()">
+               View Fees
+               </button>
+            </td>
+         </tr>
+         <tr>
+            <!-- View owners -->
+            <td>
+               <label for="viewOwners">View Owners</label><br>
+               <input type="text" id="viewOwners"><br>
+               <button onclick="viewFees()">
+               View Fees
+               </button>
+            </td>
+            <!-- Total owners -->
+            <td>
+               <label for="totalOwners">View Total Owners</label><br>
+               <button onclick="totalOwners()">
+               View Total Owners
+               </button>
+            </td>
+            <!-- Consensus state -->
+            <td>
+               <label for="consensusState">Check Consensus State</label><br>
+               <input type="text" id="chcekConsensus"><br>
+               <button onclick="consensusState()">
+               See if the owner has agreed
+               </button>
+            </td>
+            <!-- Consensus result -->
+            <td>
+               <label>Consensus Result</label><br>
+               <button onclick="consensusResult()">
+               View Consensus Result
+               </button>
+            </td>
+            <!-- Contract state -->
+            <td>
+               <label>Contract Status</label><br>
+               <button onclick="paused()">
+               Contract Frozen or Active
+               </button>
             </td>
          </tr>
       </table>
-      <!-- importing libraries -->
-      <script src="https://cdn.jsdelivr.net/npm/web3@4.2.2/dist/web3.min.js"></script>    
-      <script src ="script.js"></script>
-      <script>
-         //-------------------------Connecting to wallet-----------------------//
-         const web3 = new Web3(window.ethereum);
-         //-------------------Loading the contract into the page----------------//
-         const abi = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "fees_",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "owner_1",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "owner_2",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "owner_3",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "state",
-				"type": "bool"
-			}
-		],
-		"name": "consensusState",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "state",
-				"type": "bool"
-			}
-		],
-		"name": "contractIs",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "conversationID",
-				"type": "uint256"
-			}
-		],
-		"name": "conversationCreated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "newLeader",
-				"type": "address"
-			}
-		],
-		"name": "leaderAdded",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "removedLeader",
-				"type": "address"
-			}
-		],
-		"name": "leaderRemoved",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "conversationID",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "bytes",
-				"name": "message",
-				"type": "bytes"
-			}
-		],
-		"name": "message",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "conversationID",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "participant",
-				"type": "address"
-			}
-		],
-		"name": "participantAdded",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "voter",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "vote",
-				"type": "bool"
-			}
-		],
-		"name": "voted",
-		"type": "event"
-	},
-	{
-		"stateMutability": "payable",
-		"type": "fallback"
-	},
-	{
-		"inputs": [],
-		"name": "activeOwners",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newLeader",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "otherLeader",
-				"type": "address"
-			}
-		],
-		"name": "addLeader",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "identifier",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "participant",
-				"type": "address"
-			}
-		],
-		"name": "addParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "state",
-				"type": "bool"
-			}
-		],
-		"name": "agree",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "consensus",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "consensusResult",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "conversation",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "identifier",
-				"type": "uint256"
-			}
-		],
-		"name": "createConversation",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "identifier",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "message_",
-				"type": "bytes"
-			}
-		],
-		"name": "deliverMessage",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address payable",
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "extractFunds",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "fees",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getConsensus",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "leaderShip_control",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "ownerAddresses",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "owners",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "pause",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bool",
-				"name": "state",
-				"type": "bool"
-			}
-		],
-		"name": "pauseContract",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "otherLeader",
-				"type": "address"
-			}
-		],
-		"name": "removeLeader",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address payable",
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "soleLeader",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "users",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "leader",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "state",
-				"type": "bool"
-			}
-		],
-		"name": "vote",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"stateMutability": "payable",
-		"type": "receive"
-	}
-];
-         const contractAddress = "0x4AD1e0996467E5DAee8c2C1B3e8BDD313C4F3607";
-         const contract = new web3.eth.Contract(abi, contractAddress);  
-      </script>
+      <!-- ===== State View Functions ===== -->
+      <table id="state_write_functions">
+         <tr>
+            <!-- Create Conversation -->
+            <td>
+               <label>Create Conversation</label><br>
+               <input type="number" id="createConversation">
+               <button onclick="createConversation()">
+               Create Conversation
+               </button>
+            </td>
+            <!-- Add Participant -->
+            <td>
+               <label>Add participant</label><br>
+               <input type="number" id="participantID_add">
+               <input type="text" id="participantAddress_add">
+               <button onclick="addParticipant()">
+               Add Participant
+               </button>
+            </td>
+            <!-- Deliver Message -->
+            <td>
+               <label>Deliver Message</label><br>
+               <input type="number" id="conversationID_deliver" placeholder="conversation ID">
+               <input type="text" id="message_deliver" placeholder="message">
+               <button onclick="deliverMessage()">
+               Deliver Message
+               </button>
+            </td>
+         </tr>
+      </table>
+      <!-- ===== Owner Specific Write Functions ===== -->
+      <table id="owner_state_write_functions">
+         <tr>
+            <!-- Vote -->
+            <td>
+               <label>Upvote on Consensus</label><br>
+               <!--client side check required here, also pass a bool
+                  and not a string to RPC -->
+               <input type="text" id="upVote">
+               <button onclick="upVoteConsensus()">
+               upVote
+               </button>
+            </td>
+            <td>
+               <label>downVote on Consensus</label><br>
+               <!--client side check required here, also pass a bool
+                  and not a string to RPC -->
+               <input type="text" id="downVote">
+               <button onclick="downVoteConsensus()">
+               downVote
+               </button>
+            </td>
+            <!-- Add Owner -->
+            <td>
+               <label>Add owner</label><br>
+               <input type="text" id="newOwner_Add">
+               <input type="text" id="coSigner_Add">
+               <button onclick="addOwner()">
+               Add Owner
+               </button>
+            </td>
+            <!-- Remove Owner -->
+            <td>
+               <label>Remove Owner</label><br>
+               <input type="text" id="newOwner_Remove">
+               <input type="text" id="coSigner_Remove">
+               <button onclick="removeOwner()">
+               Remove Owner
+               </button>
+            </td>
+            <!-- Pause -->
+            <td>
+               <label>Pause</label><br>
+               <button onclick="pause()">Pause Contract</button>
+            </td>
+            <!-- Resume -->
+            <td>
+               <label>Resume</label><br>
+               <button onclick="resume()">Resume Contract</button>
+            </td>
+            <!-- Extract Funds-->
+            <td>
+               <label>Extract Funds</label><br>
+               <input type="text" placeholder="recipient" id="extraction_Recipient">
+               <input type="number" placeholder="amount" id="extraction_Amount">
+               <button onclick="extractFunds()">Extract Funds</button>
+            </td>
+            <!--Solo Leader Extract-->
+            <td>
+               <label>
+               <input type="text" placeholder="recipient" id="soloExtract_Recipient">
+               <input type="number" placeholder="amount" id="soloExtraction_Amount">
+               <button onclick="soloExtractFunds()">Solo Owner Extract</button>
+               </label>
+            </td>
+         </tr>
+      </table>
+      <!-- ===== Scripts ===== -->
+      <script src="https://cdn.jsdelivr.net/npm/web3@4.2.2/dist/web3.min.js"></script>
+      <script src="script.js"></script>
    </body>
 </html>
