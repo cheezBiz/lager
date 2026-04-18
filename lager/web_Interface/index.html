@@ -1,184 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Lager</title>
-      <!-- CSS file -->
-      <link rel="stylesheet" href="style.css">
-   </head>
-   <body>
-      <h1>Welcome to Lager!</h1>
-      <table id="state_view_functions">
-         <!-- ===== State View Functions ===== -->
-         <tr>
-            <!-- Check if conversation is created -->
-            <td>
-               <label for="convoID">Check if conversation is created</label><br>
-               <input type="number" id="convoID"><br>
-               <button onclick="conversationCreated()">
-               Check if conversation is created
-               </button>
-            </td>
-            <!-- Check participants -->
-            <td>
-               <label for="participantID, participantAddress">
-               Check conversation Participants
-               </label><br>
-               <input type="number" id="participantID" placeholder="Participant ID"><br>
-               <input type="text" id="participantAddress" placeholder="Participant Address"><br>
-               <button onclick="conversationParticipants()">
-               Check Participants
-               </button>
-            </td>
-            <!-- View fees -->
-            <td>
-               <label for="viewFees">View Fees</label><br>
-               <button id="viewFees" onclick="viewFees()">
-               View Fees
-               </button>
-            </td>
-         </tr>
-         <tr>
-            <!-- View owners -->
-            <td>
-               <label for="viewOwners">View Owners</label><br>
-               <input type="text" id="viewOwners"><br>
-               <button onclick="viewFees()">
-               View Fees
-               </button>
-            </td>
-            <!-- Total owners -->
-            <td>
-               <label for="totalOwners">View Total Owners</label><br>
-               <button onclick="totalOwners()">
-               View Total Owners
-               </button>
-            </td>
-            <!-- Consensus state -->
-            <td>
-               <label for="consensusState">Check Consensus State</label><br>
-               <input type="text" id="chcekConsensus"><br>
-               <button onclick="consensusState()">
-               See if the owner has agreed
-               </button>
-            </td>
-            <!-- Consensus result -->
-            <td>
-               <label>Consensus Result</label><br>
-               <button onclick="consensusResult()">
-               View Consensus Result
-               </button>
-            </td>
-            <!-- Contract state -->
-            <td>
-               <label>Contract Status</label><br>
-               <button onclick="paused()">
-               Contract Frozen or Active
-               </button>
-            </td>
-         </tr>
-      </table>
-      <!-- ===== State View Functions ===== -->
-      <table id="state_write_functions">
-         <tr>
-            <!-- Create Conversation -->
-            <td>
-               <label>Create Conversation</label><br>
-               <input type="number" id="createConversation">
-               <button onclick="createConversation()">
-               Create Conversation
-               </button>
-            </td>
-            <!-- Add Participant -->
-            <td>
-               <label>Add participant</label><br>
-               <input type="number" id="participantID_add">
-               <input type="text" id="participantAddress_add">
-               <button onclick="addParticipant()">
-               Add Participant
-               </button>
-            </td>
-            <!-- Deliver Message -->
-            <td>
-               <label>Deliver Message</label><br>
-               <input type="number" id="conversationID_deliver" placeholder="conversation ID">
-               <input type="text" id="message_deliver" placeholder="message">
-               <button onclick="deliverMessage()">
-               Deliver Message
-               </button>
-            </td>
-         </tr>
-      </table>
-      <!-- ===== Owner Specific Write Functions ===== -->
-      <table id="owner_state_write_functions">
-         <tr>
-            <!-- Vote -->
-            <td>
-               <label>Upvote on Consensus</label><br>
-               <!--client side check required here, also pass a bool
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lager</title>
+	<!-- CSS file -->
+	<link rel="stylesheet" href="style.css"> </head>
+
+<body>
+	<h1>Welcome to Lager!</h1>
+	<table id="state_view_functions">
+		<!-- ===== State View Functions ===== -->
+		<tr>
+			<!-- Check if conversation is created -->
+			<td>
+				<label for="convoID">Check if conversation is created</label>
+				<br>
+				<input type="number" id="convoID">
+				<br>
+				<button onclick="conversationCreated()"> Check if conversation is created </button>
+			</td>
+			<!-- Check participants -->
+			<td>
+				<label for="participantID, participantAddress"> Check conversation Participants </label>
+				<br>
+				<input type="number" id="participantID" placeholder="Participant ID">
+				<br>
+				<input type="text" id="participantAddress" placeholder="Participant Address">
+				<br>
+				<button onclick="conversationParticipants()"> Check Participants </button>
+			</td>
+			<!-- View fees -->
+			<td>
+				<label for="viewFees">View Fees</label>
+				<br>
+				<button id="viewFees" onclick="viewFees()"> View Fees </button>
+			</td>
+		</tr>
+		<tr>
+			<!-- View owners -->
+			<td>
+				<label for="viewOwners">View Owners</label>
+				<br>
+				<input type="text" id="viewOwners">
+				<br>
+				<button onclick="viewFees()"> View Fees </button>
+			</td>
+			<!-- Total owners -->
+			<td>
+				<label for="totalOwners">View Total Owners</label>
+				<br>
+				<button onclick="totalOwners()"> View Total Owners </button>
+			</td>
+			<!-- Consensus state -->
+			<td>
+				<label for="consensusState">Check Consensus State</label>
+				<br>
+				<input type="text" id="chcekConsensus">
+				<br>
+				<button onclick="consensusState()"> See if the owner has agreed </button>
+			</td>
+			<!-- Consensus result -->
+			<td>
+				<label>Consensus Result</label>
+				<br>
+				<button onclick="consensusResult()"> View Consensus Result </button>
+			</td>
+			<!-- Contract state -->
+			<td>
+				<label>Contract Status</label>
+				<br>
+				<button onclick="paused()"> Contract Frozen or Active </button>
+			</td>
+		</tr>
+	</table>
+	<!-- ===== State View Functions ===== -->
+	<table id="state_write_functions">
+		<tr>
+			<!-- Create Conversation -->
+			<td>
+				<label>Create Conversation</label>
+				<br>
+				<input type="number" id="createConversation">
+				<button onclick="createConversation()"> Create Conversation </button>
+			</td>
+			<!-- Add Participant -->
+			<td>
+				<label>Add participant</label>
+				<br>
+				<input type="number" id="participantID_add">
+				<input type="text" id="participantAddress_add">
+				<button onclick="addParticipant()"> Add Participant </button>
+			</td>
+			<!-- Deliver Message -->
+			<td>
+				<label>Deliver Message</label>
+				<br>
+				<input type="number" id="conversationID_deliver" placeholder="conversation ID">
+				<input type="text" id="message_deliver" placeholder="message">
+				<button onclick="deliverMessage()"> Deliver Message </button>
+			</td>
+		</tr>
+	</table>
+	<!-- ===== Owner Specific Write Functions ===== -->
+	<table id="owner_state_write_functions">
+		<tr>
+			<!-- Vote -->
+			<td>
+				<label>Upvote on Consensus</label>
+				<br>
+				<!--client side check required here, also pass a bool
                   and not a string to RPC -->
-               <input type="text" id="upVote">
-               <button onclick="upVoteConsensus()">
-               upVote
-               </button>
-            </td>
-            <td>
-               <label>downVote on Consensus</label><br>
-               <!--client side check required here, also pass a bool
+				<input type="text" id="upVote">
+				<button onclick="upVoteConsensus()"> upVote </button>
+			</td>
+			<td>
+				<label>downVote on Consensus</label>
+				<br>
+				<!--client side check required here, also pass a bool
                   and not a string to RPC -->
-               <input type="text" id="downVote">
-               <button onclick="downVoteConsensus()">
-               downVote
-               </button>
-            </td>
-            <!-- Add Owner -->
-            <td>
-               <label>Add owner</label><br>
-               <input type="text" id="newOwner_Add">
-               <input type="text" id="coSigner_Add">
-               <button onclick="addOwner()">
-               Add Owner
-               </button>
-            </td>
-            <!-- Remove Owner -->
-            <td>
-               <label>Remove Owner</label><br>
-               <input type="text" id="newOwner_Remove">
-               <input type="text" id="coSigner_Remove">
-               <button onclick="removeOwner()">
-               Remove Owner
-               </button>
-            </td>
-            <!-- Pause -->
-            <td>
-               <label>Pause</label><br>
-               <button onclick="pause()">Pause Contract</button>
-            </td>
-            <!-- Resume -->
-            <td>
-               <label>Resume</label><br>
-               <button onclick="resume()">Resume Contract</button>
-            </td>
-            <!-- Extract Funds-->
-            <td>
-               <label>Extract Funds</label><br>
-               <input type="text" placeholder="recipient" id="extraction_Recipient">
-               <input type="number" placeholder="amount" id="extraction_Amount">
-               <button onclick="extractFunds()">Extract Funds</button>
-            </td>
-            <!--Solo Leader Extract-->
-            <td>
-               <label>
-               <input type="text" placeholder="recipient" id="soloExtract_Recipient">
-               <input type="number" placeholder="amount" id="soloExtraction_Amount">
-               <button onclick="soloExtractFunds()">Solo Owner Extract</button>
-               </label>
-            </td>
-         </tr>
-      </table>
-      <!-- ===== Scripts ===== -->
-      <script src="https://cdn.jsdelivr.net/npm/web3@4.2.2/dist/web3.min.js"></script>
-      <script src="script.js"></script>
-   </body>
+				<input type="text" id="downVote">
+				<button onclick="downVoteConsensus()"> downVote </button>
+			</td>
+			<!-- Add Owner -->
+			<td>
+				<label>Add owner</label>
+				<br>
+				<input type="text" id="newOwner_Add">
+				<input type="text" id="coSigner_Add">
+				<button onclick="addOwner()"> Add Owner </button>
+			</td>
+			<!-- Remove Owner -->
+			<td>
+				<label>Remove Owner</label>
+				<br>
+				<input type="text" id="newOwner_Remove">
+				<input type="text" id="coSigner_Remove">
+				<button onclick="removeOwner()"> Remove Owner </button>
+			</td>
+			<!-- Pause -->
+			<td>
+				<label>Pause</label>
+				<br>
+				<button onclick="pause()">Pause Contract</button>
+			</td>
+			<!-- Resume -->
+			<td>
+				<label>Resume</label>
+				<br>
+				<button onclick="resume()">Resume Contract</button>
+			</td>
+			<!-- Extract Funds-->
+			<td>
+				<label>Extract Funds</label>
+				<br>
+				<input type="text" placeholder="recipient" id="extraction_Recipient">
+				<input type="number" placeholder="amount" id="extraction_Amount">
+				<button onclick="extractFunds()">Extract Funds</button>
+			</td>
+			<!--Solo Leader Extract-->
+			<td>
+				<label>
+					<input type="text" placeholder="recipient" id="soloExtract_Recipient">
+					<input type="number" placeholder="amount" id="soloExtraction_Amount">
+					<button onclick="soloExtractFunds()">Solo Owner Extract</button>
+				</label>
+			</td>
+		</tr>
+	</table>
+	<!-- ===== Scripts ===== -->
+	<script src="https://cdn.jsdelivr.net/npm/web3@4.2.2/dist/web3.min.js"></script>
+	<script src="script.js"></script>
+</body>
+
 </html>
