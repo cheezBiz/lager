@@ -509,6 +509,8 @@ const abi = [
 //------------------------------CONNECTION Variables--------------------------------//
 let web3;
 let contract;
+let accounts;
+let user;
 //------------------------------CONNECTION FUNCTIONS--------------------------------//
 
 window.addEventListener("load", async () => {
@@ -529,6 +531,8 @@ window.addEventListener("load", async () => {
     "0x4AD1e0996467E5DAee8c2C1B3e8BDD313C4F3607"
   );
 
+  accounts = await web3.eth.getAccounts();
+  user = accounts[0];
   console.log("Initialized");
 });
 //------------------------------ENCRYPT--------------------------------//
@@ -615,7 +619,11 @@ contract.methods.sendMessage(id, message)
 //------------------------Non state modifying functions-----------------------//
 //TODO: add other functions
 async function getValue() {
-  const result = await contract.methods.myMethod().call();
+  const result = await contract.methods.myMethod().call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
@@ -635,48 +643,202 @@ contract.events.conversationCreated({
 
 async function conversationCreated() {
   const conversationID = document.getElementById("convoID").value;
-  const result = await contract.methods.conversation(conversationID).call();
+  const result = await contract.methods.conversation(conversationID).call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function conversationParticipants(){
   const conversationID=document.getElementById("participantID").value;
   const userAddress=document.getElementById("participantAddress").value;
-  const result = await contract.methods.users(conversationID, userAddress).call();
+  const result = await contract.methods.users(conversationID, userAddress).call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function viewFees() {
-  const result = await contract.methods.fees().call();
+  const result = await contract.methods.fees().call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function owners() {
   const ownerAddress=document.getElementById("viewOwners").value;
-  const result = await contract.methods.owners(ownerAddress).call();
+  const result = await contract.methods.owners(ownerAddress).call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function totalOwners() {
-  const result = await contract.methods.activeOwners().call();
+  const result = await contract.methods.activeOwners().call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function consensusState() {
   const ownerAddress=document.getElementById("checkConsensus").value;
-  const result = await contract.methods.consensus(ownerAddress).call();
+  const result = await contract.methods.consensus(ownerAddress).call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function consensusResult() {
-  const result = await contract.methods.consensusResult().call();
+  const result = await contract.methods.consensusResult().call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 async function paused() {
-  const result = await contract.methods.pause().call();
+  const result = await contract.methods.pause().call(
+	{
+		from:user
+	}
+  );
   console.log(result);
 }
 
 
-//-------------------------
+//------------------------- State write Functions -------------------------------//
+
+
+
+function createConversation() {
+  const identifier = document.getElementById("createConversation").value;
+  contract.methods.createConversation(identifier)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function addParticipant(){
+	const identifier = document.getElementById("participantID_add").value;
+	const address = document.getElementById("participantAddress_add").value;
+	contract.methods.addParticipant(identifier, address)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function deliverMessage(){
+	const identifier = document.getElementById("conversationID_deliver").value;
+	const message = document.getElementById("message_deliver").value;
+	contract.methods.deliverMessage(identifier, message)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+//------------------------- Owner Specific Write Functions -------------------------------//
+
+function upVoteConsensus(){
+	contract.methods.agree(true)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+function downVoteConsensus(){
+	contract.methods.agree(false)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function AgreeOnAdding_Leader(){
+	const leader = document.getElementById("agreeOnAddition").value;
+	contract.methods.vote(leader, true)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function DisagreeOnAdding_Leader(){
+	const leader = document.getElementById("disagreeOnAddition").value;
+	contract.methods.vote(leader, false)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function addOwner(){
+	const newLeader = document.getElementById("newOwner_Add").value;
+	const otherLeader = document.getElementById("coSigner_Add").value;
+	contract.methods.addLeader(newLeader, otherLeader)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function removeOwner(){
+	const newLeader = document.getElementById("newOwner_Remove").value;
+	const otherLeader = document.getElementById("coSigner_Remove").value;
+	contract.methods.removeLeader(newLeader, otherLeader)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function pause(){
+	contract.methods.pauseContract(true)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function resume(){
+	contract.methods.pauseContract(false)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function extractFunds(){
+	const recipient = document.getElementById("extraction_Recipient").value;
+	const amount = document.getElementById("extraction_Amount").value;
+	contract.methods.extractFunds(recipient, amount)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
+
+function soleExtractFunds(){
+	const recipient = document.getElementById("soloExtract_Recipient").value;
+	const amount = document.getElementById("soloExtraction_Amount").value;
+	contract.methods.soleLeader(recipient, amount)
+    .send({ from: user })
+    .on("transactionHash", hash => console.log("TX sent:", hash))
+    .on("receipt", receipt => console.log("TX confirmed:", receipt))
+    .on("error", err => console.error(err));
+}
